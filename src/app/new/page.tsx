@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useEffect, useState } from "react";
 
 export default function Home() {
@@ -7,7 +7,7 @@ export default function Home() {
   const [dateData, setDateData] = useState({ date: '' });
   const [priceData, setPriceData] = useState({ price: '' });
   const [nameList, setNameList] = useState<{ name: string; price: number}[]>([]);
-  const [companyList, setCompanyList] = useState<{ card: string; price: number, expiry: Date  }[]>([]);
+  const [companyList, setCompanyList] = useState<{ card: string; price: number; expiry: Date  }[]>([]);
 
   // Load existing names from local storage on component mount
   useEffect(() => {
@@ -15,7 +15,7 @@ export default function Home() {
       const storedNames = localStorage.getItem('companies');
       const storedCompany = localStorage.getItem(formData.name.toUpperCase());
       if (storedNames) {
-        setNameList(JSON.parse(storedNames).map((item: any) => ({
+        setNameList(JSON.parse(storedNames).map((item: { name: string, price: number, expiry: string }) => ({
           ...item,
           expiry: new Date(item.expiry), // Convert stored date strings to Date objects
         })));
@@ -24,7 +24,7 @@ export default function Home() {
         setCompanyList(JSON.parse(storedCompany));
       }
     }
-  }, []);
+  }, [formData.name]); // Added formData.name as a dependency
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -35,8 +35,8 @@ export default function Home() {
     const existingNameIndex = nameList.findIndex(item => item.name === formData.name.toUpperCase());
     const existingCardIndex = companyList.findIndex(item => item.card === cardData.name);
 
-    let updatedNameList = [...nameList];
-    let updatedCardList = [...companyList];
+    const updatedNameList = [...nameList];
+    const updatedCardList = [...companyList];
 
     if (existingNameIndex !== -1) {
       updatedNameList[existingNameIndex].price += priceValue;

@@ -12,7 +12,7 @@ export const submit = (company: string, card: string, cost: number, expiry: stri
         }
 
         if (storedCompany) {
-            companyList = JSON.parse(storedCompany).map((item: any) => ({
+            companyList = JSON.parse(storedCompany).map((item: { card: string; price: number; expiry: string }) => ({
                 ...item,
                 expiry: new Date(item.expiry), // Convert stored date strings to Date objects
             }));
@@ -22,7 +22,7 @@ export const submit = (company: string, card: string, cost: number, expiry: stri
 
         // Handle name list update (without expiry)
         const existingNameIndex = nameList.findIndex(item => item.name === company.toUpperCase());
-        let updatedNameList = [...nameList];
+        const updatedNameList = [...nameList];
 
         if (existingNameIndex !== -1) {
             updatedNameList[existingNameIndex].price += cost;
@@ -33,7 +33,7 @@ export const submit = (company: string, card: string, cost: number, expiry: stri
 
         // Handle card list update (with expiry)
         const existingCardIndex = companyList.findIndex(item => item.card === card);
-        let updatedCardList = [...companyList];
+        const updatedCardList = [...companyList];
 
         if (existingCardIndex !== -1) {
             updatedCardList[existingCardIndex].price += cost;

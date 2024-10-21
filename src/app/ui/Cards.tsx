@@ -2,9 +2,21 @@ import { useState, useEffect } from "react";
 import { GiftCard } from "./GiftCard";
 import { submit } from "../functions/submit_function";
 
+// Define interfaces for the card and company data
+interface Card {
+  card: string;
+  price: number;
+  expiry: Date;
+}
+
+interface CompanyData {
+  name: string;
+  price: number;
+}
+
 export function Card({ company }: { company: string }) {
   const [text, setText] = useState('');
-  const [cards, setCards] = useState<{ card: string; price: number; expiry: Date }[]>([]);
+  const [cards, setCards] = useState<Card[]>([]);
   const [cardData, setCardData] = useState({ name: '' });
   const [dateData, setDateData] = useState({ date: '' });
   const [priceData, setPriceData] = useState({ price: '' });
@@ -20,9 +32,9 @@ export function Card({ company }: { company: string }) {
 
     if (localStorageText) {
       try {
-        const data = JSON.parse(localStorageText);
+        const data: CompanyData[] = JSON.parse(localStorageText);
         const companyName = company?.toUpperCase();
-        const companyData = data.find((item: { name: string }) => item.name === companyName);
+        const companyData = data.find((item: CompanyData) => item.name === companyName);
 
         if (companyData) {
           const price = companyData.price;
@@ -39,8 +51,12 @@ export function Card({ company }: { company: string }) {
     }
 
     if (cardList) {
-      const cardData = JSON.parse(cardList);
-      setCards(cardData.map((card: any) => ({ ...card, expiry: new Date(card.expiry) })));
+      try {
+        const cardData: Card[] = JSON.parse(cardList);
+        setCards(cardData.map((card) => ({ ...card, expiry: new Date(card.expiry) })));
+      } catch (error) {
+        console.error('Failed to parse card list data', error);
+      }
     }
   };
 
@@ -65,12 +81,14 @@ export function Card({ company }: { company: string }) {
       const storedCards = localStorage.getItem(company?.toUpperCase());
       if (storedCards) {
         try {
-          const data = JSON.parse(storedCards);
-          const cardsWithDates = data.map((card: any) => ({
+          const data: Card[] = JSON.parse(storedCards);
+          const cardsWithDates = data.map((card) => ({
             ...card,
-            expiry: new Date(card.expiry)
+            expiry: new Date(card.expiry),
           }));
-          const sortedCards = cardsWithDates.sort((a: any, b: any) => a.expiry.getTime() - b.expiry.getTime());
+          const sortedCards = cardsWithDates.sort(
+            (a, b) => a.expiry.getTime() - b.expiry.getTime()
+          );
           setCards(sortedCards);
         } catch (error) {
           console.error('Failed to parse local storage data', error);
@@ -125,11 +143,16 @@ export function Card({ company }: { company: string }) {
                 <button type="submit" className="px-5 py-2 bg-cyan-50 hover:bg-cyan-500 rounded-full">Submit</button>
               </form>
             )}
-            <button onClick={handleClick} className="hover:cursor-pointer hover:shadow-2xl bg-cyan-50 hover:bg-cyan-500 px-5 py-3 rounded-full text-xl">+</button>
+            <button
+              onClick={handleClick}
+              className="hover:cursor-pointer hover:shadow-2xl bg-cyan-50 hover:bg-cyan-500 px-5 py-3 rounded-full text-xl"
+            >
+              +
+            </button>
           </div>
         </div>
         <ol className="py-1">
-          {cards.map((card, index) => (
+          {cards.map((card) => (
             <li key={`${card.card}-${card.expiry.getTime()}`}>
               <GiftCard
                 company={company}

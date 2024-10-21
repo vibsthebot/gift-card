@@ -2,13 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { Card } from './ui/Cards';
-import Link from 'next/link';
 
 const Home = () => {
-  const [companies, setCompanies] = useState<{ name: string; price: number}[]>([]);
+  const [companies, setCompanies] = useState<{ name: string; price: number }[]>([]);
   const [showDetails, setShowDetails] = useState(false);
   const [company2, setCompany] = useState('');
-  const [cardList, setCardList] = useState<{ name: string; price: number}[]>([]);
 
   const handleClick = () => {
     setShowDetails(!showDetails);
@@ -31,7 +29,7 @@ const Home = () => {
     const storedCompanies = localStorage.getItem('companies');
     if (storedCompanies) {
       try {
-        const data = JSON.parse(storedCompanies);
+        const data: { name: string; price: number }[] = JSON.parse(storedCompanies);
         if (Array.isArray(data)) {
           setCompanies(data); // Assuming item has a 'name' property
         }
